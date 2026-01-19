@@ -66,12 +66,12 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                 iv_load_policy: 3,      // Disable video annotations
             };
 
-            // Add protection wrapper class
-            var playerContainer = document.getElementById(elementId);
-            if (playerContainer && playerContainer.parentElement) {
-                playerContainer.parentElement.classList.add('supervideo-youtube-protected');
+            // Add protection wrapper class to main container
+            var mainContainer = document.getElementById('supervideo_area_embed');
+            if (mainContainer) {
+                mainContainer.classList.add('supervideo-youtube-protected');
                 // Block right-click context menu
-                playerContainer.parentElement.addEventListener('contextmenu', function (e) {
+                mainContainer.addEventListener('contextmenu', function (e) {
                     e.preventDefault();
                     return false;
                 });
