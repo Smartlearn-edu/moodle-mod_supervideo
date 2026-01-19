@@ -96,6 +96,12 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             posterOverlay.style.backgroundImage = 'url(https://img.youtube.com/vi/' + videoid + '/maxresdefault.jpg)';
             wrapper.appendChild(posterOverlay);
 
+            // Create permanent protection overlay - blocks the channel logo link in top left
+            // This stays visible even while playing to prevent URL appearing in browser status bar
+            var protectionOverlay = document.createElement('div');
+            protectionOverlay.className = 'supervideo-protection-overlay';
+            wrapper.appendChild(protectionOverlay);
+
             // Create big play button
             var bigPlay = document.createElement('div');
             bigPlay.className = 'supervideo-big-play';
@@ -219,6 +225,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             playBtn.addEventListener('click', togglePlay);
             bigPlay.addEventListener('click', togglePlay);
             posterOverlay.addEventListener('click', togglePlay);
+            protectionOverlay.addEventListener('click', togglePlay);
 
             // Progress bar click
             progressContainer.addEventListener('click', function (e) {

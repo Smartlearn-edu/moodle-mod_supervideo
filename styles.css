@@ -123,6 +123,20 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   pointer-events: none;
 }
 
+/* Permanent protection overlay - stays on even while playing */
+/* Blocks YouTube's internal links to prevent URL appearing in browser status bar */
+.supervideo-protection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 40;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /* Disable text selection */
 .supervideo-player-wrapper {
   -webkit-user-select: none;
