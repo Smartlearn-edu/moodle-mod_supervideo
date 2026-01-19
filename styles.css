@@ -77,11 +77,20 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
 
 /* ========================================
    YouTube Video Protection Styles
-   Hide title, share buttons, and logo
+   Uses Plyr controls + pointer-events:none on iframe
    ======================================== */
 
-/* Container for YouTube videos - uses :has() for modern browsers */
-body #supervideo_area_embed:has([id^="youtube-"]) {
+/* Make YouTube iframes completely non-interactive */
+/* Plyr provides external controls, so we don't need the iframe to be clickable */
+#supervideo_area_embed iframe,
+.supervideo-youtube-protected iframe,
+.plyr__video-embed iframe,
+.plyr iframe {
+  pointer-events: none !important;
+}
+
+/* Disable text selection on protected container */
+.supervideo-youtube-protected {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -89,107 +98,15 @@ body #supervideo_area_embed:has([id^="youtube-"]) {
   -webkit-touch-callout: none;
 }
 
-/* Top overlay - covers title, watch later, share buttons */
-body #supervideo_area_embed:has([id^="youtube-"])::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  z-index: 100;
-  background: transparent;
-  pointer-events: auto;
+
+/* Additional iframe protection for videoWrap (freemode) */
+#videoWrap iframe,
+#videoWrap .plyr iframe {
+  pointer-events: none !important;
 }
 
-/* Bottom overlay - DISABLED to allow video controls to work */
-body #supervideo_area_embed:has([id^="youtube-"])::after {
-  content: none;
-}
 
-/* Fallback: Class-based targeting for older browsers */
-body #supervideo_area_embed.supervideo-youtube-protected {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
 
-body #supervideo_area_embed.supervideo-youtube-protected::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  z-index: 100;
-  background: transparent;
-  pointer-events: auto;
-}
-
-/* Bottom overlay - DISABLED to allow video controls to work */
-body #supervideo_area_embed.supervideo-youtube-protected::after {
-  content: none;
-}
-
-/* ========================================
-   Additional YouTube Protection for #videoWrap (freemode)
-   ======================================== */
-
-/* Target #videoWrap which is used in freemode template */
-#videoWrap {
-  position: relative !important;
-}
-
-/* Top overlay for freemode - covers title, watch later, share buttons */
-#videoWrap::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 80px !important;
-  z-index: 9999 !important;
-  background: transparent !important;
-  pointer-events: auto !important;
-}
-
-/* Bottom overlay - DISABLED to allow video controls to work */
-#videoWrap::after {
-  content: none !important;
-}
-
-/* Generic protection for any YouTube iframe in the page */
-iframe[src*="youtube.com"],
-iframe[src*="youtube-nocookie.com"] {
-  pointer-events: auto;
-}
-
-/* Wrapper for any parent containing YouTube iframe */
-:has(> iframe[src*="youtube.com"]),
-:has(> iframe[src*="youtube-nocookie.com"]) {
-  position: relative !important;
-}
-
-:has(> iframe[src*="youtube.com"])::before,
-:has(> iframe[src*="youtube-nocookie.com"])::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 80px !important;
-  z-index: 9999 !important;
-  background: transparent !important;
-  pointer-events: auto !important;
-}
-
-/* Bottom overlay - DISABLED to allow video controls to work */
-:has(> iframe[src*="youtube.com"])::after,
-:has(> iframe[src*="youtube-nocookie.com"])::after {
-  content: none !important;
-}
 
 #page-mod-supervideo-report table.flexible .header .commands {
   display: none;

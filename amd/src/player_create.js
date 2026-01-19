@@ -62,33 +62,9 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                 autoplay: autoplay,
                 playsinline: 1,
                 start: start_currenttime ? start_currenttime : 0,
-                modestbranding: 1,      // Reduce YouTube branding
-                iv_load_policy: 3,      // Disable video annotations
+                modestbranding: 1,
+                iv_load_policy: 3,
             };
-
-            // Add protection wrapper class to main container
-            var mainContainer = document.getElementById('supervideo_area_embed');
-            if (mainContainer) {
-                mainContainer.classList.add('supervideo-youtube-protected');
-                // Block right-click context menu
-                mainContainer.addEventListener('contextmenu', function (e) {
-                    e.preventDefault();
-                    return false;
-                });
-
-                // Create corner overlays to block YouTube buttons while keeping center controls accessible
-                // Bottom-left overlay (covers "Watch on YouTube" link)
-                var bottomLeftOverlay = document.createElement('div');
-                bottomLeftOverlay.className = 'supervideo-overlay-bottom-left';
-                bottomLeftOverlay.style.cssText = 'position:absolute;bottom:0;left:0;width:200px;height:60px;z-index:9999;background:transparent;pointer-events:auto;';
-                mainContainer.appendChild(bottomLeftOverlay);
-
-                // Bottom-right overlay (covers YouTube logo)
-                var bottomRightOverlay = document.createElement('div');
-                bottomRightOverlay.className = 'supervideo-overlay-bottom-right';
-                bottomRightOverlay.style.cssText = 'position:absolute;bottom:0;right:0;width:150px;height:60px;z-index:9999;background:transparent;pointer-events:auto;';
-                mainContainer.appendChild(bottomRightOverlay);
-            }
 
             var player;
             if (YT && YT.Player) {
@@ -99,15 +75,15 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                     playerVars: playerVars,
                     events: {
                         "onReady": function (event) {
-
-                            var sizes = playersize.split("x");
-                            console.log(sizes);
+                            var sizes = playersize ? playersize.split("x") : null;
                             if (sizes && sizes[1]) {
-                                console.log(sizes);
                                 player_create._internal_resize(sizes[0], sizes[1]);
                             } else {
                                 player_create._internal_resize(16, 9);
                             }
+
+                            // Add protection overlays after player is ready
+                            player_create._addYouTubeProtection(elementId);
 
                             document.addEventListener("setCurrentTime", function (event) {
                                 player.seekTo(event.detail.goCurrentTime);
@@ -132,6 +108,43 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                     player_create._internal_saveprogress(player.getCurrentTime(), player.getDuration() - 1);
                 }
             }, 150);
+        },
+
+        // Helper function to add YouTube protection overlays
+        _addYouTubeProtection: function (elementId) {
+            var iframe = document.getElementById(elementId);
+            if (!iframe) return;
+
+            var container = iframe.parentElement;
+            if (!container) return;
+
+            // Make container positioned for overlays
+            container.style.position = 'relative';
+            container.classList.add('supervideo-youtube-protected');
+
+            // Block right-click
+            container.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Top overlay - blocks title, share, watch later (80px from top)
+            var topOverlay = document.createElement('div');
+            topOverlay.className = 'supervideo-protection-top';
+            topOverlay.style.cssText = 'position:absolute;top:0;left:0;right:0;height:60px;z-index:9999;background:transparent;pointer-events:auto;';
+            container.appendChild(topOverlay);
+
+            // Bottom-left overlay - blocks "Watch on YouTube" link
+            var bottomLeftOverlay = document.createElement('div');
+            bottomLeftOverlay.className = 'supervideo-protection-bottom-left';
+            bottomLeftOverlay.style.cssText = 'position:absolute;bottom:0;left:0;width:200px;height:50px;z-index:9999;background:transparent;pointer-events:auto;';
+            container.appendChild(bottomLeftOverlay);
+
+            // Bottom-right overlay - blocks YouTube logo
+            var bottomRightOverlay = document.createElement('div');
+            bottomRightOverlay.className = 'supervideo-protection-bottom-right';
+            bottomRightOverlay.style.cssText = 'position:absolute;bottom:0;right:0;width:150px;height:50px;z-index:9999;background:transparent;pointer-events:auto;';
+            container.appendChild(bottomRightOverlay);
         },
 
         resource_audio: function (view_id, start_currenttime, elementId) {
