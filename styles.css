@@ -148,6 +148,78 @@ body #supervideo_area_embed.supervideo-youtube-protected::after {
   pointer-events: auto;
 }
 
+/* ========================================
+   Additional YouTube Protection for #videoWrap (freemode)
+   ======================================== */
+
+/* Target #videoWrap which is used in freemode template */
+#videoWrap {
+  position: relative !important;
+}
+
+/* Top overlay for freemode - covers title, watch later, share buttons */
+#videoWrap::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 80px !important;
+  z-index: 9999 !important;
+  background: linear-gradient(to bottom, #000000 0%, #000000 50%, transparent 100%) !important;
+  pointer-events: auto !important;
+}
+
+/* Bottom-right overlay for freemode - covers YouTube logo */
+#videoWrap::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 150px !important;
+  height: 50px !important;
+  z-index: 9999 !important;
+  background: linear-gradient(to left, #000000 0%, #000000 60%, transparent 100%) !important;
+  pointer-events: auto !important;
+}
+
+/* Generic protection for any YouTube iframe in the page */
+iframe[src*="youtube.com"],
+iframe[src*="youtube-nocookie.com"] {
+  pointer-events: auto;
+}
+
+/* Wrapper for any parent containing YouTube iframe */
+:has(> iframe[src*="youtube.com"]),
+:has(> iframe[src*="youtube-nocookie.com"]) {
+  position: relative !important;
+}
+
+:has(> iframe[src*="youtube.com"])::before,
+:has(> iframe[src*="youtube-nocookie.com"])::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 80px !important;
+  z-index: 9999 !important;
+  background: linear-gradient(to bottom, #000000 0%, #000000 50%, transparent 100%) !important;
+  pointer-events: auto !important;
+}
+
+:has(> iframe[src*="youtube.com"])::after,
+:has(> iframe[src*="youtube-nocookie.com"])::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 150px !important;
+  height: 50px !important;
+  z-index: 9999 !important;
+  background: linear-gradient(to left, #000000 0%, #000000 60%, transparent 100%) !important;
+  pointer-events: auto !important;
+}
 
 #page-mod-supervideo-report table.flexible .header .commands {
   display: none;
