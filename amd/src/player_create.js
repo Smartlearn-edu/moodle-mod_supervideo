@@ -75,6 +75,19 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                     e.preventDefault();
                     return false;
                 });
+
+                // Create corner overlays to block YouTube buttons while keeping center controls accessible
+                // Bottom-left overlay (covers "Watch on YouTube" link)
+                var bottomLeftOverlay = document.createElement('div');
+                bottomLeftOverlay.className = 'supervideo-overlay-bottom-left';
+                bottomLeftOverlay.style.cssText = 'position:absolute;bottom:0;left:0;width:200px;height:60px;z-index:9999;background:transparent;pointer-events:auto;';
+                mainContainer.appendChild(bottomLeftOverlay);
+
+                // Bottom-right overlay (covers YouTube logo)
+                var bottomRightOverlay = document.createElement('div');
+                bottomRightOverlay.className = 'supervideo-overlay-bottom-right';
+                bottomRightOverlay.style.cssText = 'position:absolute;bottom:0;right:0;width:150px;height:60px;z-index:9999;background:transparent;pointer-events:auto;';
+                mainContainer.appendChild(bottomRightOverlay);
             }
 
             var player;

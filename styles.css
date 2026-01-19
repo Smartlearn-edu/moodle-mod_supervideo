@@ -102,18 +102,9 @@ body #supervideo_area_embed:has([id^="youtube-"])::before {
   pointer-events: auto;
 }
 
-/* Bottom overlay - covers YouTube logo (right) and "Watch on YouTube" link (left) */
+/* Bottom overlay - DISABLED to allow video controls to work */
 body #supervideo_area_embed:has([id^="youtube-"])::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  z-index: 100;
-  background: transparent;
-  pointer-events: none;
-  /* Allow video controls to work */
+  content: none;
 }
 
 /* Fallback: Class-based targeting for older browsers */
@@ -137,17 +128,9 @@ body #supervideo_area_embed.supervideo-youtube-protected::before {
   pointer-events: auto;
 }
 
+/* Bottom overlay - DISABLED to allow video controls to work */
 body #supervideo_area_embed.supervideo-youtube-protected::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  z-index: 100;
-  background: transparent;
-  pointer-events: none;
-  /* Allow video controls to work */
+  content: none;
 }
 
 /* ========================================
@@ -172,18 +155,9 @@ body #supervideo_area_embed.supervideo-youtube-protected::after {
   pointer-events: auto !important;
 }
 
-/* Bottom overlay for freemode - covers YouTube logo (right) and "Watch on YouTube" link (left) */
+/* Bottom overlay - DISABLED to allow video controls to work */
 #videoWrap::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 70px !important;
-  z-index: 9999 !important;
-  background: transparent !important;
-  pointer-events: none !important;
-  /* Allow video controls to work */
+  content: none !important;
 }
 
 /* Generic protection for any YouTube iframe in the page */
@@ -211,18 +185,10 @@ iframe[src*="youtube-nocookie.com"] {
   pointer-events: auto !important;
 }
 
+/* Bottom overlay - DISABLED to allow video controls to work */
 :has(> iframe[src*="youtube.com"])::after,
 :has(> iframe[src*="youtube-nocookie.com"])::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: 70px !important;
-  z-index: 9999 !important;
-  background: transparent !important;
-  pointer-events: none !important;
-  /* Allow video controls to work */
+  content: none !important;
 }
 
 #page-mod-supervideo-report table.flexible .header .commands {
