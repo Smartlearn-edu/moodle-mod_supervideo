@@ -89,11 +89,12 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             playerDiv.id = elementId + '-player';
             wrapper.appendChild(playerDiv);
 
-            // Create transparent overlay to block all hover events on the iframe
-            // This prevents YouTube from showing title bar and URL on hover
-            var hoverBlocker = document.createElement('div');
-            hoverBlocker.className = 'supervideo-hover-blocker';
-            wrapper.appendChild(hoverBlocker);
+            // Create poster overlay - covers YouTube's native UI with the video thumbnail
+            // This prevents seeing YouTube's title bar and logo before playing
+            var posterOverlay = document.createElement('div');
+            posterOverlay.className = 'supervideo-poster-overlay';
+            posterOverlay.style.backgroundImage = 'url(https://img.youtube.com/vi/' + videoid + '/maxresdefault.jpg)';
+            wrapper.appendChild(posterOverlay);
 
             // Create big play button
             var bigPlay = document.createElement('div');
@@ -217,7 +218,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             }
             playBtn.addEventListener('click', togglePlay);
             bigPlay.addEventListener('click', togglePlay);
-            hoverBlocker.addEventListener('click', togglePlay);
+            posterOverlay.addEventListener('click', togglePlay);
 
             // Progress bar click
             progressContainer.addEventListener('click', function (e) {

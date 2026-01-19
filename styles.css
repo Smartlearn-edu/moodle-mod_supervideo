@@ -99,18 +99,28 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   border: 0;
 }
 
-/* Transparent overlay that blocks hover events on the iframe */
-/* This prevents YouTube from showing title bar on hover */
-.supervideo-hover-blocker {
+/* Poster overlay - shows video thumbnail and covers YouTube's native UI */
+/* This prevents seeing YouTube's title bar and logo before playing */
+.supervideo-poster-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 50;
-  background: transparent;
+  background-color: #000;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   cursor: pointer;
   pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+/* When playing, fade out the poster overlay to reveal video */
+.supervideo-player-wrapper.playing .supervideo-poster-overlay {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Disable text selection */
