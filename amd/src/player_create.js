@@ -56,95 +56,260 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
         youtube: function (view_id, start_currenttime, elementId, videoid, playersize, showcontrols, autoplay) {
             player_create._internal_view_id = view_id;
 
-            var playerVars = {
-                rel: 0,
-                controls: showcontrols,
-                autoplay: autoplay,
-                playsinline: 1,
-                start: start_currenttime ? start_currenttime : 0,
-                modestbranding: 1,
-                iv_load_policy: 3,
-            };
-
-            var player;
-            if (YT && YT.Player) {
-                player = new YT.Player(elementId, {
-                    suggestedQuality: "large",
-                    videoId: videoid,
-                    width: "100%",
-                    playerVars: playerVars,
-                    events: {
-                        "onReady": function (event) {
-                            var sizes = playersize ? playersize.split("x") : null;
-                            if (sizes && sizes[1]) {
-                                player_create._internal_resize(sizes[0], sizes[1]);
-                            } else {
-                                player_create._internal_resize(16, 9);
-                            }
-
-                            // Add protection overlays after player is ready
-                            player_create._addYouTubeProtection(elementId);
-
-                            document.addEventListener("setCurrentTime", function (event) {
-                                player.seekTo(event.detail.goCurrentTime);
-                            });
-                        },
-                        "onStateChange": function (event) {
-                            console.log(event);
-                        }
-                    }
-                });
-            } else {
-                var html =
-                    `<div class="alert alert-danger">
-                             Error loading the JavaScript at https://www.youtube.com/iframe_api
-                             Please check for any Security Policy restrictions.
-                         </div>`;
-                $("#supervideo_area_embed").html(html);
+            // Get the container where we'll build our custom player
+            var container = document.getElementById(elementId);
+            if (!container) {
+                console.error("Container not found:", elementId);
+                return;
             }
 
-            setInterval(function () {
-                if (player && player.getCurrentTime != undefined) {
-                    player_create._internal_saveprogress(player.getCurrentTime(), player.getDuration() - 1);
+            // Calculate aspect ratio for responsive sizing
+            var aspectRatio = 56.25; // Default 16:9
+            if (playersize) {
+                var sizes = playersize.split("x");
+                if (sizes && sizes[1]) {
+                    aspectRatio = (parseInt(sizes[1]) / parseInt(sizes[0])) * 100;
                 }
-            }, 150);
-        },
+            }
 
-        // Helper function to add YouTube protection overlays
-        _addYouTubeProtection: function (elementId) {
-            var iframe = document.getElementById(elementId);
-            if (!iframe) return;
+            // Create player wrapper
+            var wrapper = document.createElement('div');
+            wrapper.className = 'supervideo-player-wrapper paused';
+            wrapper.style.paddingBottom = aspectRatio + '%';
+            wrapper.id = elementId + '-wrapper';
 
-            var container = iframe.parentElement;
-            if (!container) return;
+            // Add loading spinner
+            var loading = document.createElement('div');
+            loading.className = 'supervideo-loading';
+            wrapper.appendChild(loading);
 
-            // Make container positioned for overlays
-            container.style.position = 'relative';
-            container.classList.add('supervideo-youtube-protected');
+            // Create placeholder div for YouTube player
+            var playerDiv = document.createElement('div');
+            playerDiv.id = elementId + '-player';
+            wrapper.appendChild(playerDiv);
 
-            // Block right-click
-            container.addEventListener('contextmenu', function (e) {
+            // Create big play button
+            var bigPlay = document.createElement('div');
+            bigPlay.className = 'supervideo-big-play';
+            bigPlay.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+            wrapper.appendChild(bigPlay);
+
+            // Create controls bar
+            var controls = document.createElement('div');
+            controls.className = 'supervideo-controls';
+            controls.innerHTML = `
+                <button class="supervideo-btn supervideo-play-btn" title="Play">
+                    <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg class="pause-icon" style="display:none" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <div class="supervideo-progress-container">
+                    <div class="supervideo-progress-bar"></div>
+                </div>
+                <span class="supervideo-time">0:00 / 0:00</span>
+                <div class="supervideo-volume-container">
+                    <button class="supervideo-btn supervideo-volume-btn" title="Volume">
+                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                    <div class="supervideo-volume-slider">
+                        <div class="supervideo-volume-bar"></div>
+                    </div>
+                </div>
+                <button class="supervideo-btn supervideo-fullscreen-btn" title="Fullscreen">
+                    <svg class="fs-enter" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    <svg class="fs-exit" style="display:none" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+                </button>
+            `;
+            wrapper.appendChild(controls);
+
+            // Replace original container content with our wrapper
+            container.innerHTML = '';
+            container.appendChild(wrapper);
+
+            // Block right-click on wrapper
+            wrapper.addEventListener('contextmenu', function (e) {
                 e.preventDefault();
                 return false;
             });
 
-            // Top overlay - blocks title, share, watch later (80px from top)
-            var topOverlay = document.createElement('div');
-            topOverlay.className = 'supervideo-protection-top';
-            topOverlay.style.cssText = 'position:absolute;top:0;left:0;right:0;height:60px;z-index:9999;background:transparent;pointer-events:auto;';
-            container.appendChild(topOverlay);
+            // Initialize YouTube player with controls DISABLED
+            var player;
+            var playerVars = {
+                rel: 0,
+                controls: 0,          // HIDE YouTube controls
+                autoplay: autoplay ? 1 : 0,
+                playsinline: 1,
+                start: start_currenttime ? parseInt(start_currenttime) : 0,
+                modestbranding: 1,
+                iv_load_policy: 3,
+                showinfo: 0,
+                disablekb: 1,         // Disable keyboard shortcuts
+                fs: 0                 // Disable YouTube fullscreen button
+            };
 
-            // Bottom-left overlay - blocks "Watch on YouTube" link
-            var bottomLeftOverlay = document.createElement('div');
-            bottomLeftOverlay.className = 'supervideo-protection-bottom-left';
-            bottomLeftOverlay.style.cssText = 'position:absolute;bottom:0;left:0;width:200px;height:50px;z-index:9999;background:transparent;pointer-events:auto;';
-            container.appendChild(bottomLeftOverlay);
+            if (YT && YT.Player) {
+                player = new YT.Player(playerDiv.id, {
+                    videoId: videoid,
+                    width: '100%',
+                    height: '100%',
+                    playerVars: playerVars,
+                    events: {
+                        'onReady': function (event) {
+                            wrapper.classList.add('ready');
+                            player_create._internal_resize(16, 9);
 
-            // Bottom-right overlay - blocks YouTube logo
-            var bottomRightOverlay = document.createElement('div');
-            bottomRightOverlay.className = 'supervideo-protection-bottom-right';
-            bottomRightOverlay.style.cssText = 'position:absolute;bottom:0;right:0;width:150px;height:50px;z-index:9999;background:transparent;pointer-events:auto;';
-            container.appendChild(bottomRightOverlay);
+                            // Handle initial autoplay state
+                            if (autoplay) {
+                                wrapper.classList.remove('paused');
+                                wrapper.classList.add('playing');
+                            }
+                        },
+                        'onStateChange': function (event) {
+                            // Update UI based on player state
+                            var playIcon = controls.querySelector('.play-icon');
+                            var pauseIcon = controls.querySelector('.pause-icon');
+
+                            if (event.data === YT.PlayerState.PLAYING) {
+                                wrapper.classList.remove('paused');
+                                wrapper.classList.add('playing');
+                                playIcon.style.display = 'none';
+                                pauseIcon.style.display = 'block';
+                            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                                wrapper.classList.remove('playing');
+                                wrapper.classList.add('paused');
+                                playIcon.style.display = 'block';
+                                pauseIcon.style.display = 'none';
+                            }
+                        }
+                    }
+                });
+            } else {
+                wrapper.innerHTML = '<div class="alert alert-danger">Error loading YouTube API. Please check for Security Policy restrictions.</div>';
+                return;
+            }
+
+            // Wire up custom controls
+            var playBtn = controls.querySelector('.supervideo-play-btn');
+            var progressContainer = controls.querySelector('.supervideo-progress-container');
+            var progressBar = controls.querySelector('.supervideo-progress-bar');
+            var timeDisplay = controls.querySelector('.supervideo-time');
+            var volumeBtn = controls.querySelector('.supervideo-volume-btn');
+            var volumeSlider = controls.querySelector('.supervideo-volume-slider');
+            var volumeBar = controls.querySelector('.supervideo-volume-bar');
+            var fullscreenBtn = controls.querySelector('.supervideo-fullscreen-btn');
+
+            // Play/Pause button
+            function togglePlay() {
+                if (player && player.getPlayerState) {
+                    var state = player.getPlayerState();
+                    if (state === YT.PlayerState.PLAYING) {
+                        player.pauseVideo();
+                    } else {
+                        player.playVideo();
+                    }
+                }
+            }
+            playBtn.addEventListener('click', togglePlay);
+            bigPlay.addEventListener('click', togglePlay);
+
+            // Progress bar click
+            progressContainer.addEventListener('click', function (e) {
+                if (player && player.getDuration) {
+                    var rect = progressContainer.getBoundingClientRect();
+                    var percent = (e.clientX - rect.left) / rect.width;
+                    var time = percent * player.getDuration();
+                    player.seekTo(time, true);
+                }
+            });
+
+            // Volume button
+            var isMuted = false;
+            volumeBtn.addEventListener('click', function () {
+                if (player) {
+                    if (isMuted) {
+                        player.unMute();
+                        player.setVolume(100);
+                        volumeBar.style.width = '100%';
+                    } else {
+                        player.mute();
+                        volumeBar.style.width = '0%';
+                    }
+                    isMuted = !isMuted;
+                }
+            });
+
+            // Volume slider
+            volumeSlider.addEventListener('click', function (e) {
+                if (player) {
+                    var rect = volumeSlider.getBoundingClientRect();
+                    var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    player.setVolume(percent * 100);
+                    volumeBar.style.width = (percent * 100) + '%';
+                    if (percent > 0 && isMuted) {
+                        player.unMute();
+                        isMuted = false;
+                    }
+                }
+            });
+
+            // Fullscreen button
+            fullscreenBtn.addEventListener('click', function () {
+                var fsEnter = fullscreenBtn.querySelector('.fs-enter');
+                var fsExit = fullscreenBtn.querySelector('.fs-exit');
+
+                if (wrapper.classList.contains('fullscreen')) {
+                    wrapper.classList.remove('fullscreen');
+                    document.body.style.overflow = '';
+                    fsEnter.style.display = 'block';
+                    fsExit.style.display = 'none';
+                } else {
+                    wrapper.classList.add('fullscreen');
+                    document.body.style.overflow = 'hidden';
+                    fsEnter.style.display = 'none';
+                    fsExit.style.display = 'block';
+                }
+            });
+
+            // ESC key to exit fullscreen
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && wrapper.classList.contains('fullscreen')) {
+                    wrapper.classList.remove('fullscreen');
+                    document.body.style.overflow = '';
+                    fullscreenBtn.querySelector('.fs-enter').style.display = 'block';
+                    fullscreenBtn.querySelector('.fs-exit').style.display = 'none';
+                }
+            });
+
+            // Format time helper
+            function formatTime(seconds) {
+                if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+                var mins = Math.floor(seconds / 60);
+                var secs = Math.floor(seconds % 60);
+                return mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }
+
+            // Update progress bar and time
+            setInterval(function () {
+                if (player && player.getCurrentTime && player.getDuration) {
+                    var currentTime = player.getCurrentTime();
+                    var duration = player.getDuration();
+
+                    if (duration > 0) {
+                        var percent = (currentTime / duration) * 100;
+                        progressBar.style.width = percent + '%';
+                        timeDisplay.textContent = formatTime(currentTime) + ' / ' + formatTime(duration);
+
+                        // Save progress
+                        player_create._internal_saveprogress(currentTime, duration - 1);
+                    }
+                }
+            }, 250);
+
+            // Handle setCurrentTime event
+            document.addEventListener("setCurrentTime", function (event) {
+                if (player && player.seekTo) {
+                    player.seekTo(event.detail.goCurrentTime, true);
+                }
+            });
         },
 
         resource_audio: function (view_id, start_currenttime, elementId) {
