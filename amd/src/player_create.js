@@ -78,6 +78,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             wrapper.style.paddingBottom = aspectRatio + '%';
             wrapper.id = elementId + '-wrapper';
 
+
             // Add loading spinner
             var loading = document.createElement('div');
             loading.className = 'supervideo-loading';
@@ -87,6 +88,12 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             var playerDiv = document.createElement('div');
             playerDiv.id = elementId + '-player';
             wrapper.appendChild(playerDiv);
+
+            // Create transparent overlay to block all hover events on the iframe
+            // This prevents YouTube from showing title bar and URL on hover
+            var hoverBlocker = document.createElement('div');
+            hoverBlocker.className = 'supervideo-hover-blocker';
+            wrapper.appendChild(hoverBlocker);
 
             // Create big play button
             var bigPlay = document.createElement('div');
@@ -210,6 +217,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             }
             playBtn.addEventListener('click', togglePlay);
             bigPlay.addEventListener('click', togglePlay);
+            hoverBlocker.addEventListener('click', togglePlay);
 
             // Progress bar click
             progressContainer.addEventListener('click', function (e) {
