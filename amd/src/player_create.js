@@ -62,7 +62,20 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                 autoplay: autoplay,
                 playsinline: 1,
                 start: start_currenttime ? start_currenttime : 0,
+                modestbranding: 1,      // Reduce YouTube branding
+                iv_load_policy: 3,      // Disable video annotations
             };
+
+            // Add protection wrapper class
+            var playerContainer = document.getElementById(elementId);
+            if (playerContainer && playerContainer.parentElement) {
+                playerContainer.parentElement.classList.add('supervideo-youtube-protected');
+                // Block right-click context menu
+                playerContainer.parentElement.addEventListener('contextmenu', function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            }
 
             var player;
             if (YT && YT.Player) {
@@ -133,11 +146,11 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
 
             var config = {
                 controls: controls.split(","),
-                tooltips: {controls: showcontrols, seek: showcontrols},
+                tooltips: { controls: showcontrols, seek: showcontrols },
                 settings: ["speed", "loop"],
                 autoplay: !!autoplay,
-                storage: {enabled: true, key: "id-" + view_id},
-                speed: {selected: speed.length > 3, options: speed.split(",")},
+                storage: { enabled: true, key: "id-" + view_id },
+                speed: { selected: speed.length > 3, options: speed.split(",") },
                 seekTime: parseInt(start_currenttime) ? parseInt(start_currenttime) : 0,
             };
             var player = new PlayerRender(`#${elementId} audio`, config);
@@ -188,10 +201,10 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             const config = {
                 controls: controls.split(","),
                 autoplay: !!autoplay,
-                tooltips: {controls: showcontrols, seek: showcontrols},
+                tooltips: { controls: showcontrols, seek: showcontrols },
                 settings: ["speed", "loop"],
-                storage: {enabled: true, key: "id-" + view_id},
-                speed: {selected: speed.length > 3, options: speed.split(",")},
+                storage: { enabled: true, key: "id-" + view_id },
+                speed: { selected: speed.length > 3, options: speed.split(",") },
                 seekTime: parseInt(start_currenttime) ? parseInt(start_currenttime) : 0,
             };
 
@@ -336,7 +349,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
 
             var duration = false;
             window.addEventListener("message", (event) => {
-                const {data} = event;
+                const { data } = event;
 
                 if (data.message === 'panda_allData') {
                     duration = data.playerData.duration
@@ -348,7 +361,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             }, false);
 
             const iframe = document.getElementById(elementId).contentWindow;
-            iframe.postMessage({type: 'currentTime', parameter: currenttime});
+            iframe.postMessage({ type: 'currentTime', parameter: currenttime });
         },
 
         _error_load: function (elementId) {
@@ -489,7 +502,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             for (let j = 1; j <= player_create._internal_progress_length; j++) {
                 if (player_create._internal_assistido[j]) {
                     percent++;
-                    $(`#mapa-visualizacao-${j}`).css({opacity: 1});
+                    $(`#mapa-visualizacao-${j}`).css({ opacity: 1 });
                 }
             }
 
@@ -597,7 +610,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                             _setCurrentTime = parseInt(_setCurrentTime);
 
                             var event = document.createEvent("CustomEvent");
-                            event.initCustomEvent("setCurrentTime", true, true, {goCurrentTime: _setCurrentTime});
+                            event.initCustomEvent("setCurrentTime", true, true, { goCurrentTime: _setCurrentTime });
                             document.dispatchEvent(event);
                         });
                 $("#mapa-visualizacao .clique").append($mapa_clique);

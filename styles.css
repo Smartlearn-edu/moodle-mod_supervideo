@@ -807,6 +807,46 @@ a.plyr__control {
   display: none;
 }
 
+/* YouTube Video Protection Styles */
+.supervideo-youtube-protected {
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.supervideo-youtube-protected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 60px; /* Leave controls accessible at bottom */
+  z-index: 2;
+  pointer-events: none; /* Allow clicks to pass through for play/pause */
+  background: transparent;
+}
+
+/* When right-click is attempted, block it */
+.supervideo-youtube-protected.blocking::before {
+  pointer-events: auto;
+}
+
+/* Hide YouTube watermark/logo link area (top-right corner) */
+.supervideo-youtube-protected iframe {
+  pointer-events: auto;
+}
+
+/* Ensure the iframe container doesn't allow text selection */
+.supervideo-youtube-protected * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
 .plyr__time {
   font-size: 13px;
   font-size: var(--plyr-font-size-time, var(--plyr-font-size-small, 13px));
