@@ -98,21 +98,22 @@ body #supervideo_area_embed:has([id^="youtube-"])::before {
   right: 0;
   height: 80px;
   z-index: 100;
-  background: linear-gradient(to bottom, #000000 0%, #000000 50%, transparent 100%);
+  background: transparent;
   pointer-events: auto;
 }
 
-/* Bottom-right overlay - covers YouTube logo */
+/* Bottom overlay - covers YouTube logo (right) and "Watch on YouTube" link (left) */
 body #supervideo_area_embed:has([id^="youtube-"])::after {
   content: '';
   position: absolute;
   bottom: 0;
+  left: 0;
   right: 0;
-  width: 150px;
-  height: 50px;
+  height: 70px;
   z-index: 100;
-  background: linear-gradient(to left, #000000 0%, #000000 60%, transparent 100%);
-  pointer-events: auto;
+  background: transparent;
+  pointer-events: none;
+  /* Allow video controls to work */
 }
 
 /* Fallback: Class-based targeting for older browsers */
@@ -132,7 +133,7 @@ body #supervideo_area_embed.supervideo-youtube-protected::before {
   right: 0;
   height: 80px;
   z-index: 100;
-  background: linear-gradient(to bottom, #000000 0%, #000000 50%, transparent 100%);
+  background: transparent;
   pointer-events: auto;
 }
 
@@ -140,12 +141,13 @@ body #supervideo_area_embed.supervideo-youtube-protected::after {
   content: '';
   position: absolute;
   bottom: 0;
+  left: 0;
   right: 0;
-  width: 150px;
-  height: 50px;
+  height: 70px;
   z-index: 100;
-  background: linear-gradient(to left, #000000 0%, #000000 60%, transparent 100%);
-  pointer-events: auto;
+  background: transparent;
+  pointer-events: none;
+  /* Allow video controls to work */
 }
 
 /* ========================================
@@ -166,21 +168,22 @@ body #supervideo_area_embed.supervideo-youtube-protected::after {
   right: 0 !important;
   height: 80px !important;
   z-index: 9999 !important;
-  background: linear-gradient(to bottom, #000000 0%, #000000 50%, transparent 100%) !important;
+  background: transparent !important;
   pointer-events: auto !important;
 }
 
-/* Bottom-right overlay for freemode - covers YouTube logo */
+/* Bottom overlay for freemode - covers YouTube logo (right) and "Watch on YouTube" link (left) */
 #videoWrap::after {
   content: '' !important;
   position: absolute !important;
   bottom: 0 !important;
+  left: 0 !important;
   right: 0 !important;
-  width: 150px !important;
-  height: 50px !important;
+  height: 70px !important;
   z-index: 9999 !important;
-  background: linear-gradient(to left, #000000 0%, #000000 60%, transparent 100%) !important;
-  pointer-events: auto !important;
+  background: transparent !important;
+  pointer-events: none !important;
+  /* Allow video controls to work */
 }
 
 /* Generic protection for any YouTube iframe in the page */
@@ -204,7 +207,7 @@ iframe[src*="youtube-nocookie.com"] {
   right: 0 !important;
   height: 80px !important;
   z-index: 9999 !important;
-  background: linear-gradient(to bottom, #000000 0%, #000000 50%, transparent 100%) !important;
+  background: transparent !important;
   pointer-events: auto !important;
 }
 
@@ -213,12 +216,13 @@ iframe[src*="youtube-nocookie.com"] {
   content: '' !important;
   position: absolute !important;
   bottom: 0 !important;
+  left: 0 !important;
   right: 0 !important;
-  width: 150px !important;
-  height: 50px !important;
+  height: 70px !important;
   z-index: 9999 !important;
-  background: linear-gradient(to left, #000000 0%, #000000 60%, transparent 100%) !important;
-  pointer-events: auto !important;
+  background: transparent !important;
+  pointer-events: none !important;
+  /* Allow video controls to work */
 }
 
 #page-mod-supervideo-report table.flexible .header .commands {
