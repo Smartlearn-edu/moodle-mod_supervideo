@@ -86,6 +86,8 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   width: 100%;
   background: #000;
   overflow: hidden;
+  direction: ltr !important;
+  /* Force LTR so progress bar works correctly in RTL languages (e.g. Arabic) */
 }
 
 /* Make iframe fill the wrapper */
@@ -366,6 +368,8 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   position: relative;
   transition: all ease 0.3s;
   z-index: 9999;
+  direction: ltr !important;
+  /* Force LTR so progress segments display correctly in RTL languages */
 }
 
 #mapa-visualizacao .mapa,
@@ -375,6 +379,8 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   position: absolute;
   top: 0;
   bottom: 0;
+  direction: ltr !important;
+  /* Force LTR so flex items are not reversed in RTL languages */
 }
 
 #mapa-visualizacao .mapa div,

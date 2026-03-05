@@ -75,6 +75,8 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             // Create player wrapper
             var wrapper = document.createElement('div');
             wrapper.className = 'supervideo-player-wrapper paused';
+            wrapper.setAttribute('dir', 'ltr'); // Force LTR for RTL languages (e.g. Arabic)
+            wrapper.style.direction = 'ltr'; // Inline style - highest CSS priority, cannot be overridden
             wrapper.style.paddingBottom = aspectRatio + '%';
             wrapper.id = elementId + '-wrapper';
 
@@ -111,6 +113,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             // Create controls bar
             var controls = document.createElement('div');
             controls.className = 'supervideo-controls';
+            controls.style.direction = 'ltr'; // Force LTR on controls bar too
             controls.innerHTML = `
                 <button class="supervideo-btn supervideo-play-btn" title="Play">
                     <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -773,6 +776,21 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             var $mapa = $("#mapa-visualizacao .mapa");
             if (!$mapa.length) {
                 return;
+            }
+
+            // Force LTR on the mapa container and its flex children for RTL languages
+            // Using setProperty with 'important' flag = inline !important = highest CSS priority
+            var mapaContainer = document.getElementById('mapa-visualizacao');
+            if (mapaContainer) {
+                mapaContainer.style.setProperty('direction', 'ltr', 'important');
+                mapaContainer.setAttribute('dir', 'ltr');
+                // Also force LTR on the .mapa and .clique flex containers
+                var flexChildren = mapaContainer.querySelectorAll('.mapa, .clique');
+                for (var fc = 0; fc < flexChildren.length; fc++) {
+                    flexChildren[fc].style.setProperty('direction', 'ltr', 'important');
+                    flexChildren[fc].style.setProperty('left', '0', 'important');
+                    flexChildren[fc].style.setProperty('right', '0', 'important');
+                }
             }
 
             var supervideo_view_mapa = [];
