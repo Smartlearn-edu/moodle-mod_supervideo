@@ -212,9 +212,11 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   border-radius: 3px;
   cursor: pointer;
   position: relative;
+  touch-action: none;
 }
 
-.supervideo-progress-container:hover {
+.supervideo-progress-container:hover,
+.supervideo-progress-container.dragging {
   height: 7px;
 }
 
@@ -225,6 +227,10 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   width: 0%;
   position: relative;
   transition: width 0.1s linear;
+}
+
+.supervideo-progress-container.dragging .supervideo-progress-bar {
+  transition: none;
 }
 
 .supervideo-progress-bar::after {
@@ -241,7 +247,8 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   transition: opacity 0.2s;
 }
 
-.supervideo-progress-container:hover .supervideo-progress-bar::after {
+.supervideo-progress-container:hover .supervideo-progress-bar::after,
+.supervideo-progress-container.dragging .supervideo-progress-bar::after {
   opacity: 1;
 }
 
@@ -268,6 +275,7 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   cursor: pointer;
   overflow: hidden;
   transition: width 0.2s;
+  touch-action: none;
 }
 
 .supervideo-volume-container:hover .supervideo-volume-slider {

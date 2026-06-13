@@ -230,27 +230,67 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             posterOverlay.addEventListener('click', togglePlay);
             protectionOverlay.addEventListener('click', togglePlay);
 
-            // Progress bar click and touch
-            function handleProgressSeek(e) {
-                if (player && player.getDuration) {
-                    var rect = progressContainer.getBoundingClientRect();
-                    var clientX;
-                    if (e.touches && e.touches.length > 0) {
-                        clientX = e.touches[0].clientX;
-                    } else if (e.changedTouches && e.changedTouches.length > 0) {
-                        clientX = e.changedTouches[0].clientX;
-                    } else {
-                        clientX = e.clientX;
-                    }
-                    var percent = (clientX - rect.left) / rect.width;
-                    percent = Math.max(0, Math.min(1, percent));
-                    var time = percent * player.getDuration();
-                    player.seekTo(time, true);
+            // Progress bar drag and seek
+            var isDraggingProgress = false;
+
+            function getClientX(e) {
+                if (e.touches && e.touches.length > 0) {
+                    return e.touches[0].clientX;
+                } else if (e.changedTouches && e.changedTouches.length > 0) {
+                    return e.changedTouches[0].clientX;
+                }
+                return e.clientX;
+            }
+
+            function updateProgressUI(e) {
+                if (!player || !player.getDuration) return null;
+                var rect = progressContainer.getBoundingClientRect();
+                var percent = (getClientX(e) - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                progressBar.style.width = (percent * 100) + '%';
+                timeDisplay.textContent = formatTime(percent * player.getDuration()) + ' / ' + formatTime(player.getDuration());
+                return percent;
+            }
+
+            function startDrag(e) {
+                isDraggingProgress = true;
+                progressContainer.classList.add('dragging');
+                updateProgressUI(e);
+            }
+
+            function moveDrag(e) {
+                if (isDraggingProgress) {
+                    if (e.cancelable) e.preventDefault();
+                    updateProgressUI(e);
                 }
             }
-            progressContainer.addEventListener('click', handleProgressSeek);
-            progressContainer.addEventListener('touchstart', handleProgressSeek, { passive: true });
-            progressContainer.addEventListener('touchmove', handleProgressSeek, { passive: true });
+
+            function endDrag(e) {
+                if (isDraggingProgress) {
+                    isDraggingProgress = false;
+                    progressContainer.classList.remove('dragging');
+                    var percent = updateProgressUI(e);
+                    if (percent !== null && player && player.seekTo) {
+                        player.seekTo(percent * player.getDuration(), true);
+                    }
+                }
+            }
+
+            progressContainer.addEventListener('mousedown', startDrag);
+            progressContainer.addEventListener('touchstart', startDrag, { passive: true });
+            
+            // Mouse events on window so dragging outside still works, but bounded to this player instance
+            window.addEventListener('mousemove', function(e) {
+                if (isDraggingProgress) moveDrag(e);
+            }, { passive: false });
+            window.addEventListener('mouseup', function(e) {
+                if (isDraggingProgress) endDrag(e);
+            });
+            
+            // Touch events on progress container (touches are naturally captured)
+            progressContainer.addEventListener('touchmove', moveDrag, { passive: false });
+            progressContainer.addEventListener('touchend', endDrag);
+            progressContainer.addEventListener('touchcancel', endDrag);
 
             // Volume button
             var isMuted = false;
@@ -331,7 +371,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
 
             // Update progress bar and time
             setInterval(function () {
-                if (player && player.getCurrentTime && player.getDuration) {
+                if (!isDraggingProgress && player && player.getCurrentTime && player.getDuration) {
                     var currentTime = player.getCurrentTime();
                     var duration = player.getDuration();
 
