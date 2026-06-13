@@ -230,15 +230,27 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
             posterOverlay.addEventListener('click', togglePlay);
             protectionOverlay.addEventListener('click', togglePlay);
 
-            // Progress bar click
-            progressContainer.addEventListener('click', function (e) {
+            // Progress bar click and touch
+            function handleProgressSeek(e) {
                 if (player && player.getDuration) {
                     var rect = progressContainer.getBoundingClientRect();
-                    var percent = (e.clientX - rect.left) / rect.width;
+                    var clientX;
+                    if (e.touches && e.touches.length > 0) {
+                        clientX = e.touches[0].clientX;
+                    } else if (e.changedTouches && e.changedTouches.length > 0) {
+                        clientX = e.changedTouches[0].clientX;
+                    } else {
+                        clientX = e.clientX;
+                    }
+                    var percent = (clientX - rect.left) / rect.width;
+                    percent = Math.max(0, Math.min(1, percent));
                     var time = percent * player.getDuration();
                     player.seekTo(time, true);
                 }
-            });
+            }
+            progressContainer.addEventListener('click', handleProgressSeek);
+            progressContainer.addEventListener('touchstart', handleProgressSeek, { passive: true });
+            progressContainer.addEventListener('touchmove', handleProgressSeek, { passive: true });
 
             // Volume button
             var isMuted = false;
@@ -256,11 +268,19 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                 }
             });
 
-            // Volume slider
-            volumeSlider.addEventListener('click', function (e) {
+            // Volume slider touch and click
+            function handleVolumeSeek(e) {
                 if (player) {
                     var rect = volumeSlider.getBoundingClientRect();
-                    var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    var clientX;
+                    if (e.touches && e.touches.length > 0) {
+                        clientX = e.touches[0].clientX;
+                    } else if (e.changedTouches && e.changedTouches.length > 0) {
+                        clientX = e.changedTouches[0].clientX;
+                    } else {
+                        clientX = e.clientX;
+                    }
+                    var percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
                     player.setVolume(percent * 100);
                     volumeBar.style.width = (percent * 100) + '%';
                     if (percent > 0 && isMuted) {
@@ -268,7 +288,10 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                         isMuted = false;
                     }
                 }
-            });
+            }
+            volumeSlider.addEventListener('click', handleVolumeSeek);
+            volumeSlider.addEventListener('touchstart', handleVolumeSeek, { passive: true });
+            volumeSlider.addEventListener('touchmove', handleVolumeSeek, { passive: true });
 
             // Fullscreen button
             fullscreenBtn.addEventListener('click', function () {
@@ -830,7 +853,7 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                     $("<div></div>")
                         .attr("title", tempo)
                         .attr("data-currenttime", mapaTitle)
-                        .click(function () {
+                        .on('click touchstart', function (e) {
                             var _setCurrentTime = $(this).attr("data-currenttime");
                             _setCurrentTime = parseInt(_setCurrentTime);
 
