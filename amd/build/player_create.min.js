@@ -190,6 +190,9 @@ define(["jquery", "core/ajax", "mod_supervideo/player_render", "jqueryui"], func
                                 wrapper.classList.add('playing');
                                 playIcon.style.display = 'none';
                                 pauseIcon.style.display = 'block';
+                                
+                                // Permanently hide the poster overlay once the video has started playing
+                                posterOverlay.style.display = 'none';
                             } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
                                 wrapper.classList.remove('playing');
                                 wrapper.classList.add('paused');
