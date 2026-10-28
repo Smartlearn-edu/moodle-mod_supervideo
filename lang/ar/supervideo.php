@@ -221,6 +221,8 @@ $string['supervideo:view_report'] = 'عرض تقارير SuperVideo';
 $string['videofile'] = 'أو حدّد ملف MP3 أو MP4 أو WebM';
 $string['videofile_help'] = 'يمكنك تحميل ملف MP3 أو MP4، استضافته على MoodleData وعرضه في مشغل Super Video';
 $string['videourl_error'] = 'رابط Super Video';
+$string['youtube_protection'] = 'وضع حماية يوتيوب';
+$string['youtube_protection_desc'] = 'عند تفعيله، يضيف حماية إضافية لفيديوهات يوتيوب (يمنع الروابط، يخفي الشعار والمعلومات، ويمنع النقر بزر الفأرة الأيمن). ملاحظة: الحماية الكاملة غير ممكنة تقنياً مع تضمين يوتيوب.';
 $string['videourl_help'] = '<h4>يوتيوب</h4>
 <div>أضف رابط يوتيوب الذي استعملته. تريد إضافته إلى المساق:</div>
 <div><strong>مثال:</strong> https://www.youtube.com/watch?v=SNhUMChfolc</div>
