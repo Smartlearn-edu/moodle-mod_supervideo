@@ -116,6 +116,8 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   position: relative;
   transition: all ease 0.3s;
   z-index: 9999;
+  direction: ltr;
+  /* Force LTR so progress segments display correctly in RTL languages */
 }
 #map-visualization .map,
 #map-visualization .clique {
@@ -124,6 +126,7 @@ body #supervideo_area_embed iframe:not(.h5p-iframe) {
   position: absolute;
   top: 0;
   bottom: 0;
+  direction: ltr !important;
 }
 #map-visualization .map div,
 #map-visualization .clique div {
@@ -1733,5 +1736,3 @@ body.distraction-free-mode .path-mod .activity-header:not(:empty) {
   padding-left: 0;
   padding-right: 0;
 }
-
-/*# sourceMappingURL=styles.css.map */

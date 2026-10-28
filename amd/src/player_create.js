@@ -952,6 +952,19 @@ define(["jquery", "core/ajax", "core/notification", "mod_supervideo/player_rende
 
         _internal_progress_create: function (duration) {
 
+            // Force LTR on the map container and its flex children for RTL languages
+            var mapContainer = document.getElementById("map-visualization");
+            if (mapContainer) {
+                mapContainer.style.setProperty("direction", "ltr", "important");
+                mapContainer.setAttribute("dir", "ltr");
+                var flexChildren = mapContainer.querySelectorAll(".map, .clique");
+                for (var fc = 0; fc < flexChildren.length; fc++) {
+                    flexChildren[fc].style.setProperty("direction", "ltr", "important");
+                    flexChildren[fc].style.setProperty("left", "0", "important");
+                    flexChildren[fc].style.setProperty("right", "0", "important");
+                }
+            }
+
             var $map = $("#map-visualization .map");
             if (!$map.length) {
                 return;
@@ -994,7 +1007,7 @@ define(["jquery", "core/ajax", "core/notification", "mod_supervideo/player_rende
                     $("<div></div>")
                         .attr("title", tempo)
                         .attr("data-currenttime", mapTitle)
-                        .click(function () {
+                        .on("click touchstart", function (e) {
                             var _setCurrentTime = $(this).attr("data-currenttime");
                             _setCurrentTime = parseInt(_setCurrentTime);
 
